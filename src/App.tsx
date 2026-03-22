@@ -10,10 +10,17 @@ export default function App() {
   const [fontFamily, setFontFamily] = useState('sans');
   const [fontSize, setFontSize] = useState('medium');
   const [text, setText] = useState('');
-  const [saveStatus, setSaveStatus] = useState('保存');
+  const [syncStatus, setSyncStatus] = useState('');
+  const [showSyncStatus, setShowSyncStatus] = useState(false);
   const [lastSavedTime, setLastSavedTime] = useState<string | null>(null);
   const [showSavedTime, setShowSavedTime] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState({
+    isOpen: false,
+    message: '',
+    confirmText: '确定',
+    onConfirm: () => {}
+  });
 
   const ambientAudioRef = useRef<HTMLAudioElement>(null);
   const dropAudioRef = useRef<HTMLAudioElement>(null);
@@ -21,6 +28,8 @@ export default function App() {
   const fadeOutTimeoutRef = useRef<number | undefined>(undefined);
   const fadeOutIntervalRef = useRef<number | undefined>(undefined);
   const savedTimeTimeoutRef = useRef<number | undefined>(undefined);
+  const typingTimeoutRef = useRef<number | undefined>(undefined);
+  const statusClearTimeoutRef = useRef<number | undefined>(undefined);
 
   // Sync volume state to audio elements
   useEffect(() => {
@@ -80,13 +89,39 @@ export default function App() {
   };
 
   const handleTyping = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
+    const newText = e.target.value;
+    setText(newText);
+    
+    setSyncStatus('正在输入……');
+    setShowSyncStatus(true);
+    if (statusClearTimeoutRef.current) clearTimeout(statusClearTimeoutRef.current);
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+    typingTimeoutRef.current = window.setTimeout(() => {
+      localStorage.setItem('flow-text', newText);
+      setSyncStatus('已自动保存');
+      setShowSyncStatus(true);
+      
+      const now = new Date();
+      setLastSavedTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      
+      statusClearTimeoutRef.current = window.setTimeout(() => {
+        setShowSyncStatus(false);
+      }, 3000);
+    }, 1500);
   };
 
   const handleSave = () => {
     localStorage.setItem('flow-text', text);
-    setSaveStatus('已保存');
-    setTimeout(() => setSaveStatus('保存'), 2000);
+    setSyncStatus('已手动保存');
+    setShowSyncStatus(true);
+    
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    if (statusClearTimeoutRef.current) clearTimeout(statusClearTimeoutRef.current);
+    
+    statusClearTimeoutRef.current = window.setTimeout(() => {
+      setShowSyncStatus(false);
+    }, 3000);
 
     const now = new Date();
     const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -96,7 +131,7 @@ export default function App() {
     if (savedTimeTimeoutRef.current) clearTimeout(savedTimeTimeoutRef.current);
     savedTimeTimeoutRef.current = window.setTimeout(() => {
       setShowSavedTime(false);
-    }, 10000);
+    }, 3000);
   };
 
   const handleWordCountClick = () => {
@@ -105,13 +140,22 @@ export default function App() {
       if (savedTimeTimeoutRef.current) clearTimeout(savedTimeTimeoutRef.current);
       savedTimeTimeoutRef.current = window.setTimeout(() => {
         setShowSavedTime(false);
-      }, 10000);
+      }, 3000);
     }
   };
 
-  const handleClear = () => {
-    setText('');
-    localStorage.removeItem('flow-text');
+  const handleClearClick = () => {
+    if (!text) return; // 如果没有内容，不需要清空
+    setConfirmConfig({
+      isOpen: true,
+      message: '确定要清空当前内容吗？',
+      confirmText: '清空',
+      onConfirm: () => {
+        setText('');
+        localStorage.removeItem('flow-text');
+        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handleExport = () => {
@@ -314,14 +358,19 @@ export default function App() {
                  className="relative flex flex-col items-start cursor-pointer group"
                  onClick={handleWordCountClick}
                >
-                 <div className="text-white/40 text-sm tracking-widest font-medium group-hover:text-white/60 transition-colors">
-                   {text.length} 字
+                 <div className="flex items-center gap-3">
+                   <div className="text-white/40 text-sm tracking-widest font-medium group-hover:text-white/60 transition-colors">
+                     {text.length} 字
+                   </div>
+                   <div className={`text-white/30 text-xs tracking-widest font-light transition-all duration-700 ease-out ${showSyncStatus ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+                     {syncStatus}
+                   </div>
                  </div>
                  <div 
-                   className={`absolute top-full left-0 mt-1 text-white/30 text-[10px] tracking-wider whitespace-nowrap transition-all duration-700 ease-out ${
+                   className={`absolute top-full left-0 mt-1 text-white/30 text-[10px] tracking-wider whitespace-nowrap transition-all ease-out ${
                      showSavedTime 
-                       ? 'opacity-100 translate-y-0' 
-                       : 'opacity-0 translate-y-2 pointer-events-none'
+                       ? 'duration-300 opacity-100 translate-y-0' 
+                       : 'duration-[3000ms] opacity-0 translate-y-2 pointer-events-none'
                    }`}
                  >
                    保存于 {lastSavedTime}
@@ -329,9 +378,9 @@ export default function App() {
                </div>
                <div className="flex items-center gap-6">
                  <button onClick={handleSave} className="text-white/50 hover:text-white/90 transition-colors text-sm tracking-widest font-medium">
-                   {saveStatus}
+                   保存
                  </button>
-                 <button onClick={handleClear} className="text-white/50 hover:text-white/90 transition-colors text-sm tracking-widest font-medium">
+                 <button onClick={handleClearClick} className="text-white/50 hover:text-white/90 transition-colors text-sm tracking-widest font-medium">
                    清空
                  </button>
                  <button onClick={handleExport} className="text-white/50 hover:text-white/90 transition-colors text-sm tracking-widest font-medium">
@@ -408,6 +457,44 @@ export default function App() {
                 style={{ background: `linear-gradient(to right, rgba(255,255,255,0.6) ${volume}%, rgba(255,255,255,0.2) ${volume}%)` }}
               />
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Custom Confirm Dialog */}
+      <div 
+        className={`fixed inset-0 z-[100] flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] ${
+          confirmConfig.isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        {/* Backdrop */}
+        <div 
+          className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+          onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+        />
+        
+        {/* Dialog Box */}
+        <div 
+          className={`relative glass-panel w-full max-w-sm p-8 rounded-[1.5rem] bg-white/[0.15] backdrop-blur-2xl border border-white/20 shadow-2xl flex flex-col items-center gap-8 transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] ${
+            confirmConfig.isOpen ? 'translate-y-0 scale-100 opacity-100' : 'translate-y-8 scale-95 opacity-0'
+          }`}
+        >
+          <p className="text-white/90 text-lg font-light tracking-wide text-center">
+            {confirmConfig.message}
+          </p>
+          <div className="flex items-center gap-4 w-full justify-center">
+            <button 
+              onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+              className="px-6 py-2.5 rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all duration-300 text-sm tracking-widest"
+            >
+              取消
+            </button>
+            <button 
+              onClick={confirmConfig.onConfirm}
+              className="px-6 py-2.5 rounded-full bg-white/10 border border-white/20 text-white/90 hover:bg-white/20 hover:text-white transition-all duration-300 text-sm tracking-widest"
+            >
+              {confirmConfig.confirmText}
+            </button>
           </div>
         </div>
       </div>
