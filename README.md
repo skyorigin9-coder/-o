@@ -6,7 +6,7 @@
 
 <br>
 
-<img src="https://your-image-url.com/forest-cover.png" alt="FlowSpace Banner" width="100%" />
+<img src="./assets/cover.png" alt="FlowSpace Banner" width="100%" />
 
 <br><br>
 
@@ -16,40 +16,58 @@
 
 <br>
 
-![Status](https://img.shields.io/badge/status-building-6c8f7d)
-![Style](https://img.shields.io/badge/style-immersive-8aa39b)
-![Mood](https://img.shields.io/badge/mood-forest%20flow-5e7c6b)
+`沉浸` · `安静` · `流动` · `自我对话`
 
 </div>
 
 ---
 
-## Overview
+## 项目简介
 
-FlowSpace 是一个以“安静表达”为核心体验的写作应用。  
-整体视觉采用森林、雾气、玻璃拟态、水波扰动等元素，营造一种柔和、流动、可停留的情绪空间。
-
----
-
-## Features
-
-- 沉浸式背景氛围
-- 中央玻璃写作面板
-- 极简输入体验
-- 环境白噪音 / 溪水音效
-- 可扩展为日记、情绪记录、治愈型写作产品
+FlowSpace 是一个偏沉浸式的写作应用。  
+整体视觉灵感来自森林、雾气、水波与毛玻璃界面，目标是让用户一打开页面，就能进入安静表达的状态。
 
 ---
 
-## Preview
+## 设计关键词
+
+- 森林氛围
+- 水波流动
+- 玻璃拟态
+- 情绪记录
+- 沉浸式写作
+
+---
+
+## 预览图
 
 <p align="center">
-  <img src="https://your-image-url.com/forest-cover.png" width="100%" alt="preview"/>
+  <img src="./assets/cover.png" alt="preview" width="100%" />
 </p>
 
 ---
 
-## Vision
+## 功能方向
 
-写作不只是记录。  
-也可以是一种缓慢下沉、重新整理自己的方式。
+- 沉浸式写作输入区
+- 动态背景效果
+- 溪水 / 雨声 / 森林白噪音
+- 情绪记录与导出
+- 专注写作模式
+
+---
+
+## 技术方向
+
+- React / Vite
+- Tailwind CSS
+- Shader / Canvas 动效
+- Web Audio 音效
+- 本地存储
+
+---
+
+## 项目愿景
+
+这不是一个普通输入框。  
+它更像一个让人慢下来、把心里东西写出来的小空间。
