@@ -14,7 +14,6 @@ export default function App() {
   const [lastSavedTime, setLastSavedTime] = useState<string | null>(null);
   const [showSavedTime, setShowSavedTime] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isActionsVisible, setIsActionsVisible] = useState(false);
 
   const ambientAudioRef = useRef<HTMLAudioElement>(null);
   const dropAudioRef = useRef<HTMLAudioElement>(null);
@@ -22,8 +21,6 @@ export default function App() {
   const fadeOutTimeoutRef = useRef<number | undefined>(undefined);
   const fadeOutIntervalRef = useRef<number | undefined>(undefined);
   const savedTimeTimeoutRef = useRef<number | undefined>(undefined);
-  const actionsTimeoutRef = useRef<number | undefined>(undefined);
-  const hasStartedTypingRef = useRef(false);
 
   // Sync volume state to audio elements
   useEffect(() => {
@@ -83,18 +80,7 @@ export default function App() {
   };
 
   const handleTyping = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newText = e.target.value;
-    setText(newText);
-    
-    // Only trigger the 10s visibility when starting to type
-    if (!hasStartedTypingRef.current && newText.length > 0) {
-      hasStartedTypingRef.current = true;
-      setIsActionsVisible(true);
-      if (actionsTimeoutRef.current) clearTimeout(actionsTimeoutRef.current);
-      actionsTimeoutRef.current = window.setTimeout(() => {
-        setIsActionsVisible(false);
-      }, 10000);
-    }
+    setText(e.target.value);
   };
 
   const handleSave = () => {
@@ -126,8 +112,6 @@ export default function App() {
   const handleClear = () => {
     setText('');
     localStorage.removeItem('flow-text');
-    hasStartedTypingRef.current = false;
-    setIsActionsVisible(false);
   };
 
   const handleExport = () => {
@@ -325,7 +309,7 @@ export default function App() {
              />
 
              {/* Bottom Bar: Word Count & Actions */}
-             <div className={`absolute bottom-0 left-0 right-6 flex items-center justify-between transition-opacity duration-700 z-20 ${text.length > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+             <div className={`absolute bottom-0 left-0 right-6 flex items-center justify-between transition-opacity duration-700 ${text.length > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
                <div 
                  className="relative flex flex-col items-start cursor-pointer group"
                  onClick={handleWordCountClick}
@@ -343,24 +327,16 @@ export default function App() {
                    保存于 {lastSavedTime}
                  </div>
                </div>
-               
-               {/* Actions Area with Hover Trigger */}
-               <div className="pt-10 pl-10 -mr-4 pr-4 -mb-4 pb-4 group/actions">
-                 <div className={`flex items-center gap-6 transition-all duration-500 ${
-                   isActionsVisible 
-                     ? 'opacity-100 translate-y-0 pointer-events-auto' 
-                     : 'opacity-0 translate-y-2 pointer-events-none group-hover/actions:opacity-100 group-hover/actions:translate-y-0 group-hover/actions:pointer-events-auto'
-                 }`}>
-                   <button onClick={handleSave} className="text-white/50 hover:text-white/90 transition-colors text-sm tracking-widest font-medium">
-                     {saveStatus}
-                   </button>
-                   <button onClick={handleClear} className="text-white/50 hover:text-white/90 transition-colors text-sm tracking-widest font-medium">
-                     清空
-                   </button>
-                   <button onClick={handleExport} className="text-white/50 hover:text-white/90 transition-colors text-sm tracking-widest font-medium">
-                     导出
-                   </button>
-                 </div>
+               <div className="flex items-center gap-6">
+                 <button onClick={handleSave} className="text-white/50 hover:text-white/90 transition-colors text-sm tracking-widest font-medium">
+                   {saveStatus}
+                 </button>
+                 <button onClick={handleClear} className="text-white/50 hover:text-white/90 transition-colors text-sm tracking-widest font-medium">
+                   清空
+                 </button>
+                 <button onClick={handleExport} className="text-white/50 hover:text-white/90 transition-colors text-sm tracking-widest font-medium">
+                   导出
+                 </button>
                </div>
              </div>
            </div>
