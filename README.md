@@ -1,24 +1,14 @@
-<div align="center">
-
 # 🌫 FlowSpace
 
 ### 在森林、水纹与安静之间，开始你的心流写作。
 
-</div>
-
 ![FlowSpace Banner](cover.png)
-
-<div align="center">
 
 > **开始你的心流写作……**  
 > 一个偏沉浸式的情绪表达空间。  
 > 让文字像水波一样慢慢散开。
 
-<br>
-
 `沉浸` · `安静` · `流动` · `自我对话`
-
-</div>
 
 ---
 
@@ -87,6 +77,6 @@ FlowSpace 是一个偏沉浸式的写作应用。
 
 ---
 
-## Status
+## 当前状态
 
-Currently in building.
+正在构建中。
