@@ -2,7 +2,7 @@
 
 ### 在森林、水纹与安静之间，开始你的心流写作。
 
-![FlowSpace Banner](cover.png)
+![FlowSpace Banner](https://raw.githubusercontent.com/skyorigin9-coder/-o/main/cover.png)
 
 > **开始你的心流写作……**  
 > 一个偏沉浸式的情绪表达空间。  
@@ -34,7 +34,7 @@ FlowSpace 是一个偏沉浸式的写作应用。
 
 ## 预览效果
 
-![FlowSpace Preview](cover.png)
+![FlowSpace Preview](https://raw.githubusercontent.com/skyorigin9-coder/-o/main/cover.png)
 
 ---
 
